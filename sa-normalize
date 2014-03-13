@@ -1,0 +1,96 @@
+#!/usr/bin/perl -w
+# Tool for normalizing text in the same way SpamAssassin does.
+# The purpose of the tool is to give the user the possibility to test how a given
+# text with foreign characters would look after been normalized by SpamAssassin,
+# so that he can adjust rules for non-ASCII words accordingly
+#
+my $version = "1.00";
+my $verdate = "2014-03-13";
+my $u1 = "sa-normalize  Spam Assassin - Text Normalizing Utility v".$version." (".$verdate.")  \n";
+my $u2 = "  usage: sa-normalize [options...] [-in charset] [-out charset] \"text\"  \n".
+	 "         sa-normalize [options...] [-in charset] [-out charset]  file  \n\n".
+	 "     Otions:  \n".
+	 "       --changelog              display version history and exit \n".
+	 "       -q, --quiet              suppress printing the program header \n".
+	 "       -h, --help               showing this information \n\n".
+	 "       -in  charset             character set of the source texte (default autodetect)  \n".
+	 "       -out charset             normalize charset: only ASCII or UTF8 possible (default ASCII)  \n\n".
+	 "     text                       text to be normalized  \n".
+	 "     file                       path to a file with text to be normalized  \n\n".
+	 "  Please not that the tool currently does not parse email messages. The input file must \n".
+	 "  contain only plain text in given character set, with no base64, quoted printable, or  \n".
+	 "  similar encoding. Only HTML entities may be included in the text.  \n\n";
+
+my $changelog =
+" 1.00 [Ivo Truxa] 03/13/2014  Initial version  \n".
+"	- UTF8 normalzing  \n".
+"	- ASCII normalizing  \n".
+"\n";
+
+sub usage {print STDERR $u1,"\n",$u2; exit 0;}
+
+use strict;
+use warnings;
+use utf8;
+use English;
+use Encode qw(decode encode);
+use Getopt::Long;				# http://perldoc.perl.org/Getopt/Long.html
+use Text::Unidecode qw(unidecode);		# Unicode transliteration
+use Encode::Detect::Detector;			# Detecting charsets
+use Mail::SpamAssassin::Message::Node;		# Node.pm with ASCII normalizing patch
+use Mail::SpamAssassin::HTML			# Decoding HTML entities
+
+
+$OUTPUT_AUTOFLUSH = 1;
+#binmode STDOUT, ':utf8';
+
+use vars qw($opt_help $opt_version $opt_quiet $opt_changelog $opt_charset $opt_normalize);
+GetOptions(
+  'help'	=> \$opt_help,
+  'version'	=> \$opt_version,
+  'quiet'	=> \$opt_quiet,
+  'changelog'	=> \$opt_changelog,
+  'in=s'	=> \$opt_charset,
+  'out=s'	=> \$opt_normalize
+) or usage();
+
+$opt_help and usage();
+$opt_normalize ||= 'US-ASCII';
+
+if (!$opt_quiet) {
+    print STDERR $u1;
+    if ($opt_changelog)	{print $changelog; exit 0;}
+}
+
+if (@ARGV) {
+    my ($data) = @ARGV;
+    my $converter;
+    my $fh;
+
+    if ( open($fh,'<', $data) ) {
+	undef $data;
+	while (<$fh>) {$data .= $_;}
+    }
+    if ($opt_charset) {
+	$converter   = Encode::find_encoding($opt_charset);
+    }
+    if (!defined $converter || !$converter->mime_name()) {
+	$opt_charset = Encode::Detect::Detector::detect($data) || 'UTF8';
+	$converter   = Encode::find_encoding($opt_charset);
+    }
+    if ($converter) {
+	if (!$opt_quiet) {
+	    print STDERR "Converting from character set ". $converter->mime_name() . " to $opt_normalize ...\n\n";
+	}
+	my $html = Mail::SpamAssassin::HTML->new();
+	my $out  = $converter->decode($data, 0);
+	utf8::downgrade($out, 1);
+	$html->parse($out);
+	$out = ($opt_normalize =~ /ascii/i)? unidecode(@{$html->{text}}) : $html->{text};
+	print "$out\n";
+    } else {print STDERR "Converter for the source character set $opt_charset not found!\n";}
+} else     {print STDERR "No data to normalize?\n";}
+
+
+exit 0 ;
+
