@@ -46,10 +46,12 @@ Usage help:
 Changelog:    
 > ./sa-normalize -changelog
 
+Normalizing text on a command line:
 > ./sa-normalize "Tschüß böse Mädchen!"
 
-> ./sa-normalize -q -out UTF8 "Έλληνες"
+> ./sa-normalize -q -out UTF8 "Έλληνες &Aacute;&Egrave;"
 
+Normalizing text in a file:
 > ./sa-normalize japanese-utf8.txt
 
 
