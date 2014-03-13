@@ -47,7 +47,9 @@ Changelog:
 > ./sa-normalize -changelog
 
 > ./sa-normalize "Tschüß böse Mädchen!"
+
 > ./sa-normalize -q -out UTF8 "Έλληνες"
+
 > ./sa-normalize japanese-utf8.txt
 
 
