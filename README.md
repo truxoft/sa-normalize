@@ -40,15 +40,15 @@ character sets, for testing.
 Examples of use
 ---------------
 
- Usage help:   ./sa-normalize -h 
- 
- Changelog:    ./sa-normalize -changelog
+Usage help:   
+> ./sa-normalize -h 
 
- ./sa-normalize "Tschüß böse Mädchen!"
- 
- ./sa-normalize -q -out UTF8 "Έλληνες"
- 
- ./sa-normalize japanese-utf8.txt
+Changelog:    
+> ./sa-normalize -changelog
+
+> ./sa-normalize "Tschüß böse Mädchen!"
+> ./sa-normalize -q -out UTF8 "Έλληνες"
+> ./sa-normalize japanese-utf8.txt
 
 
 Author
