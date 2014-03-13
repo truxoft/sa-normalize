@@ -51,7 +51,7 @@ Changelog:    ./sa-normalize -changelog
 Author
 ------
 Ivo Truxa <truxa@truxoft.com>
-v1.00 published on 13th March, 2014
+- v1.00 published on 13th March, 2014
 
 
 License
