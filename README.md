@@ -1,14 +1,14 @@
 sa-normalize
 ============
 
-SpamAssassin Tool for previewing ASCI and UTF8 normalizing for rules development
+SpamAssassin Tool for previewing US-ASCII and UTF-8 text normalizing
 
 
 Description
 -----------
 This is a simple utility for converting text in diverse languages and diverse
 character sets either to UTF-8, or to plain 7bit US-ASCII. In the second case
-discritics is stripped off from Latin characters, and non-Latin letters, 
+diacritics is stripped off from Latin characters, and non-Latin letters, 
 including sign alphabets, are transcribed to non-accented Latin characters.
 
 The tool was written for testing purposes, to simulate the result of "norma-
